@@ -27,30 +27,15 @@ struct active_flags check_flags(int argc, char **argv)
         while (argv[i][j] != '\0')
         {
             if (argv[i][j] == 'a')
-			{
 				flags.a = 1;
-			}
             else if (argv[i][j] == 'g')
-			{
                 flags.g = 1;
-
-			}
             else if (argv[i][j] == 'u')
-			{
-
                 flags.u = 1;
-			}
             else if (argv[i][j] == 'r')
-			{
-				if (flags.p	== 0)
                 	flags.r = 1;
-			}
             else if (argv[i][j] == 'p')
-            {
-				flags.p = 1;
-				if (flags.r	== 1)
-					flags.r = 0;
-			}    
+				flags.p = 1; 
             else
             {
                 fprintf(stderr, "Flag desconocido: %c\n", argv[i][j]);
@@ -79,7 +64,7 @@ int	main(int argc, char **argv)
 	}
 
 	flags = check_flags(argc,argv);
-	debug_flags(flags);
+	// debug_flags(flags);
 	i = 1;
 	while (i < argc)
 	{

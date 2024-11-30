@@ -56,20 +56,12 @@ typedef struct active_flags{
 
 
 int	ft_nm(char *filename, int fd, active_flags flags);
-int header_checker(void * _map);
 int	 analisis_ELF64(void * _map, active_flags flags);
 
 //SORTING
 void bubble_sort_sym64(elf64_manager * org, active_flags flags);
 
-//CHEKER
-int file_checker(char *filename, char *data);
-
 //DEBUG
 int debug_type_file (Elf64_Half type );
 int debug_sym64 ( Elf64_Sym *sym ,elf64_manager * org);
 int debug_shdr64(Elf64_Shdr *shdr,elf64_manager * org);
-
-
-//PARA LIBFT
-// int	ft_strcasecmp(const char *s1, const char *s2);
