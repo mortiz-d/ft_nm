@@ -32,7 +32,7 @@ La herramienta `nm` se utiliza para listar los símbolos definidos en un archivo
 
 
 Referencias adicionales sobre cómo interpretar los símbolos y su información:  
-- [Oracle ELF Format Documentation](https://docs.oracle.com/cd/E19683-01/816-1386/chapter6-94076/index.html)
+- [Oracle ELF Format Documentation](https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/6n33n7fcd/index.html)
 
 ### `readelf` - Análisis del Formato ELF
 
