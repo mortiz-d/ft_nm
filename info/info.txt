@@ -1,3 +1,4 @@
+https://own2pwn.fr/elf-intro
 https://man7.org/linux/man-pages/man1/nm.1.html
 https://man7.org/linux/man-pages/man5/elf.5.html
 
@@ -21,9 +22,20 @@ objdump [opciones] archivo
     -s   (volcado en hexadecimal)
     -p   (dependencias)
 
-hexdump
+hexdump [opciones] archivo
+    -C   (estilo canónico: direcciones, hexadecimales y ASCII)
+    -n   (mostrar solo los primeros N bytes)
+    -s   (desplazar el inicio del volcado N bytes)
+    -e   (especificar el formato de salida)
+    -v   (mostrar todo sin comprimir, incluso repeticiones)
+    -x   (mostrar en formato hexadecimal de 2 bytes)
+    -b   (mostrar en formato binario)
+    -o   (mostrar en formato octal)
+    -c   (mostrar caracteres ASCII correspondientes)
+    -p   (mostrar solo los bytes, sin direcciones ni ASCII)
 
 nm -p <archivo>
+https://docs.oracle.com/cd/E19683-01/816-1386/6m7qcoblh/index.html
 
 https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/chapter6-43405/index.html
 //La cabecera del archivo elh , contiene todos los datos del mismo
@@ -77,7 +89,7 @@ STB_GLOBAL      1 //Global symbols. These symbols are visible to all object file
 STB_WEAK        2 //Weak symbols. These symbols resemble global symbols, but their definitions have lower precedence.
 
 (type)
- STT_NOTYPE     0 //The symbol type is not specified.
+STT_NOTYPE      0 //The symbol type is not specified.
 STT_OBJECT      1 //This symbol is associated with a data object, such as a variable, an array, and so forth
 STT_FUNC        2 //This symbol is associated with a function or other executable code.
 STT_SECTION     3 //This symbol is associated with a section. Symbol table entries of this type exist primarily for relocation and normally have STB_LOCAL binding.
@@ -105,4 +117,11 @@ symbol posibilities
 - ?             The symbol type is unknown
 
 
+FLAGS nm
+• -a Display all symbols, even debugger-only symbols; normally these are not listed. 
+• -g Display only external symbols.
+• -u Display only undefined symbols (those external to each object file).
+• -r Reverse the order of the sort (whether numeric or alphabetic); let the last come first. 
+• -p Do not bother to sort the symbols in any order; print them in the order encountered. 
 
+LC_COLLATE=C

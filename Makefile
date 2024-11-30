@@ -61,38 +61,44 @@ SRCS =	srcs/ft_nm.c \
 		srcs/main.c \
 		srcs/checker.c \
 		srcs/_64/analisis.c \
-		srcs/_64/debug.c
+		srcs/_64/debug.c \
+		srcs/_64/sort.c 
 
 # FLAGS #
 OBJS_DIR = objetos
 OBJS = $(SRCS:srcs/%.c=$(OBJS_DIR)/%.o)
 
-NAME = prueba
-FILE_TEST = objetos/main.o#tests/ft_strlen.o#
+NAME = ft_nm
+
+LIBFT_A = libft/libft.a
+FILE_TEST = tests/ft_strlen.o#objetos/main.o#
 
 CC = gcc
 
-CFLAGS = #-Wall -Werror -Wextra
+CFLAGS = -std=c99 -Wall -Werror -Wextra
 
 # Instructions #
 all: $(NAME)
 
 $(NAME): $(OBJS)
+	@make -C ./libft
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT_A)
 	$(BLUE) NM set Up $(RESET)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 $(OBJS_DIR)/%.o: srcs/%.c
-	$(CYAN) Compiling LIBFT Object $< $(RESET)
 #Creamos las carpetas necesarias para compilar
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c $<  -o $@
+	$(CYAN) NM Object Compiled $< $(RESET)
 
 clean:
-	$(PURPLE) Cleaning LIBFT Objects $(RESET)
+	@make fclean -s -C./libft
 	@rm -rf $(OBJS_DIR)
+	$(PURPLE) Cleaned NM Objects $(RESET)
 
 fclean: clean
 	rm -rf $(NAME)
+	$(PURPLE) Cleaned NM Executable $(RESET)	
 
 re: fclean all
 

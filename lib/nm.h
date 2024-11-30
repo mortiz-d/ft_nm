@@ -20,19 +20,20 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <strings.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include "../libft/libft.h"
+
 
 #ifndef DEBUG
-# define DEBUG 0
+# define DEBUG 1
 #endif
 
 #define NM_FILE_NOT_FOUND(filename) (printf("nm: '%s': No hay tal fichero\n", filename), 1)
 #define NM_IS_DIR(filename) (printf("nm: Aviso: '%s' es un directorio\n", filename), 1)
 #define NM_CANT_MMAP(filename) (printf("nm: Aviso: '%s' no se puede mapear\n", filename), 1)
 #define NM_CANT_MUNMAP(filename) (printf("nm: Aviso: '%s' no se puede desmapear\n", filename), 1)
-#define STR_GLOBAL "GLOBAL"
-#define STR_LOCAL "LOCAL"
 
 typedef struct elf64_manager{                   
     int num_symbols;
@@ -40,25 +41,35 @@ typedef struct elf64_manager{
     Elf64_Ehdr *elf_header;
     Elf64_Shdr *shdr;
     const char *strtab;
+    const char *sh_strtab;
+    size_t      strtab_size;
 } elf64_manager;
 
+typedef struct active_flags{                   
+    int a;
+    int g;
+    int u;
+    int r;
+    int p;
+} active_flags;
 
-typedef struct symbol_data{
-    char result;
-    int type;
-    int bind;
-}symbol_data;
 
 
+int	ft_nm(char *filename, int fd, active_flags flags);
+int header_checker(void * _map);
+int	 analisis_ELF64(void * _map, active_flags flags);
 
-int	ft_nm(char *filename, int fd);
-int header_checker(void * _map, struct stat _file_data);
-int	 analisis_ELF64(void * _map, struct stat _file_data);
+//SORTING
+void bubble_sort_sym64(elf64_manager * org, active_flags flags);
 
 //CHEKER
 int file_checker(char *filename, char *data);
 
 //DEBUG
 int debug_type_file (Elf64_Half type );
-int debug_symbols(elf64_manager * org, void * _map);
+int debug_sym64 ( Elf64_Sym *sym ,elf64_manager * org);
+int debug_shdr64(Elf64_Shdr *shdr,elf64_manager * org);
 
+
+//PARA LIBFT
+// int	ft_strcasecmp(const char *s1, const char *s2);
