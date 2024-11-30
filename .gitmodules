@@ -1,0 +1,3 @@
+[submodule "libft"]
+	path = libft
+	url = https://github.com/zitro646/42_Libft.git
