@@ -12,9 +12,50 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
 
 - **`nm`**: Muestra las tablas de símbolos de un archivo binario.
 - **`readelf`**: Muestra información detallada sobre los encabezados de ELF, secciones y símbolos.
-- **`objdump`**: Proporciona una forma de desensamblar el código y ver la estructura interna de los binarios.
-- **`hexdump`**: Permite visualizar el contenido binario de los archivos en diferentes formatos.
+## `readelf [opciones] archivo`
+<details>
+  <summary>Opciones</summary>
+  
+  - `-h` (header)  
+  - `-l` (encabezados de segmentos)  
+  - `-S` (encabezados de secciones)  
+  - `-s` (Tabla de simbolos)  
+  - `-r` (relocalizacion)  
+  - `-t` (detalles de las secciones)  
 
+</details>
+
+- **`objdump`**: Proporciona una forma de desensamblar el código y ver la estructura interna de los binarios.
+## `objdump [opciones] archivo`
+<details>
+  <summary>Opciones</summary>
+  
+  - `-h` (encabezado del archivo binario)  
+  - `-d` (desensamblar código)  
+  - `-D` (desensamblar completo)  
+  - `-t` (tabla de símbolos)  
+  - `-r` (reubicaciones)  
+  - `-x` (detalles de las secciones)  
+  - `-s` (volcado en hexadecimal)  
+  - `-p` (dependencias)  
+
+- **`hexdump`**: Permite visualizar el contenido binario de los archivos en diferentes formatos.
+## `hexdump [opciones] archivo`
+<details>
+  <summary>Opciones</summary>
+  
+  - `-C` (estilo canónico: direcciones, hexadecimales y ASCII)  
+  - `-n` (mostrar solo los primeros N bytes)  
+  - `-s` (desplazar el inicio del volcado N bytes)  
+  - `-e` (especificar el formato de salida)  
+  - `-v` (mostrar todo sin comprimir, incluso repeticiones)  
+  - `-x` (mostrar en formato hexadecimal de 2 bytes)  
+  - `-b` (mostrar en formato binario)  
+  - `-o` (mostrar en formato octal)  
+  - `-c` (mostrar caracteres ASCII correspondientes)  
+  - `-p` (mostrar solo los bytes, sin direcciones ni ASCII)  
+
+</details>
 ---
 
 ## 2. Herramientas de Inspección
@@ -98,11 +139,14 @@ typedef struct {
 ```
 
 Los símbolos pueden tener diferentes tipos y atributos, tales como:
-- **STB_LOCAL**: Símbolos locales, solo visibles dentro del archivo.
-- **STB_GLOBAL**: Símbolos globales, visibles para otros archivos.
-- **STB_WEAK**: Símbolos débiles, con menor prioridad que los símbolos globales.
+- **STB_LOCAL**		**0**: Símbolos locales, solo visibles dentro del archivo.
+- **STB_GLOBAL**	**1**: Símbolos globales, visibles para otros archivos.
+- **STB_WEAK**		**2**: Símbolos débiles, con menor prioridad que los símbolos globales.
 
 **Tipos de símbolos**:
-- **STT_FUNC**: Funciones.
-- **STT_OBJECT**: Objetos de datos (como variables).
-- **STT_SECTION**: Símbolos asociados a secciones.
+- **STT_NOTYPE**	**0**: El tipo de simbolo no esta especificado.
+- **STT_OBJECT**	**1**: Objetos de datos (como variables).
+- **STT_FUNC**		**2**: Funciones.
+- **STT_SECTION**	**3**: Símbolos asociados a secciones.
+- **STT_FILE**		**4**:Simbolo asociado al nombre del fichero
+- **STT_COMMON**	**5**:Simbolo comun sin inicializar , se trata igual que el **STT_OBJECT**

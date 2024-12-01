@@ -39,43 +39,60 @@ struct active_flags check_flags(int argc, char **argv)
             else
             {
                 fprintf(stderr, "Flag desconocido: %c\n", argv[i][j]);
-                return flags;
+                break;
             }
             j++;
         }
-        i++;  // Pasar al siguiente argumento
+        i++;
     }
 
     return flags;
 }
 
+int exec_ft_nm()
+{
+
+    return (0);
+}
+
 int	main(int argc, char **argv)
 {
-	int		i;
-	int		fd;
+	int		i, fd , commands_exec;
 	struct active_flags flags;
-	(void)flags;
 
-	if (argc < 2)
-	{
-		fprintf(stderr, "Uso: %s [-flags] <archivo_ELF>\n", argv[0]);
-		// ft_nm("a.out");
-		return (0);
-	}
-
+	// if (argc < 2)
+	// {
+	// 	fprintf(stderr, "Uso: %s [-flags] <archivo_ELF>\n", argv[0]);
+	// 	// ft_nm("a.out");
+	// 	return (0);
+	// }j́j
+	commands_exec = 0;
 	flags = check_flags(argc,argv);
 	// debug_flags(flags);
 	i = 1;
 	while (i < argc)
 	{
-		fd = open(argv[i], O_RDONLY);
-		ft_nm(argv[i],fd, flags);
+		if (argv[i][0] != '-')
+		{
+
+			fd = open(argv[i], O_RDONLY);
+			ft_nm(argv[i],fd, flags);
+			if (fd != -1)
+				close(fd);
+			commands_exec++;
+			// printf("FIN de '%s'\n",argv[i]);
+		}
+		i++;
+	}
+
+	if (commands_exec == 0)
+	{
+		fd = open("a.out", O_RDONLY);
+		ft_nm("a.out",fd, flags);
 		if (fd != -1)
-            close(fd);
-        // printf("FIN de '%s'\n",argv[i]);
-        i++;
-    }
-    
+			close(fd);
+	}
+		
     // 
     // ft_nm("file_test/ft_strlen.o");
     return 0 ;
