@@ -12,21 +12,21 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
 
 - **`nm`**: Muestra las tablas de símbolos de un archivo binario.
 - **`readelf`**: Muestra información detallada sobre los encabezados de ELF, secciones y símbolos.
-<details>
-  <summary>Opciones</summary>
+    <details>
+      <summary>Opciones</summary>
+    
+    - `-h` (header)  
+    - `-l` (encabezados de segmentos)  
+    - `-S` (encabezados de secciones)  
+    - `-s` (Tabla de simbolos)  
+    - `-r` (relocalizacion)  
+    - `-t` (detalles de las secciones)  
   
-  - `-h` (header)  
-  - `-l` (encabezados de segmentos)  
-  - `-S` (encabezados de secciones)  
-  - `-s` (Tabla de simbolos)  
-  - `-r` (relocalizacion)  
-  - `-t` (detalles de las secciones)  
-
-</details>
+    </details>
 
 - **`objdump`**: Proporciona una forma de desensamblar el código y ver la estructura interna de los binarios.
-<details>
-  <summary>Opciones</summary>
+  <details>
+    <summary>Opciones</summary>
   
   - `-h` (encabezado del archivo binario)  
   - `-d` (desensamblar código)  
@@ -36,11 +36,11 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
   - `-x` (detalles de las secciones)  
   - `-s` (volcado en hexadecimal)  
   - `-p` (dependencias)  
-</details>
+  </details>
 
 - **`hexdump`**: Permite visualizar el contenido binario de los archivos en diferentes formatos.
-<details>
-  <summary>Opciones</summary>
+  <details>
+    <summary>Opciones</summary>
   
   - `-C` (estilo canónico: direcciones, hexadecimales y ASCII)  
   - `-n` (mostrar solo los primeros N bytes)  
@@ -53,7 +53,7 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
   - `-c` (mostrar caracteres ASCII correspondientes)  
   - `-p` (mostrar solo los bytes, sin direcciones ni ASCII)  
 
-</details>
+  </details>
 ---
 
 ## 2. Herramientas de Inspección
