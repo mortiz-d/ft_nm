@@ -101,7 +101,7 @@ symbol posibilities
 -B/b            The symbol is in the BSS data section.
 -C/c            The symbol is common.  Common symbols are uninitialized data.
 -D/d            The symbol is in the initialized data section.
--G/g            The symbol is in the initialized data section.
+-G/g            The symbol is in the initialized data section for small objects.
 -i              For PE format files this indicates that the symbol is in a section specific to the implementation of DLLs.
 -"I"            The symbol is an indirect reference to another symbol.
 -N              The symbol is a debugging symbol.
@@ -125,3 +125,13 @@ FLAGS nm
 • -p Do not bother to sort the symbols in any order; print them in the order encountered. 
 
 LC_COLLATE=C
+
+
+B/b	.bss	Símbolos de datos no inicializados (BSS), globales o locales.
+D/d	.data, .data1	Datos inicializados, globales o locales.
+G/g	.rodata	Datos constantes, globales o locales.
+T/t	.text	Funciones, globales o locales.
+R/r	.rodata, .rodata1	Datos solo lectura, globales o locales.
+U	-	Símbolo indefinido, no tiene una definición en el archivo.
+g	.got	Símbolos globales pequeños en la tabla de desplazamiento global.
+-	-	Símbolos de depuración (stabs en archivos a.out).

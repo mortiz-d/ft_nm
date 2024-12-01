@@ -18,6 +18,9 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     
     sym_bind = ELF64_ST_BIND(sym->st_info);
     sym_type = ELF64_ST_TYPE(sym->st_info);
+
+    // V/v The symbol is a weak object 
+    // W/w The symbol is a weak symbol
     if (sym_bind == STB_WEAK)
     {
         if (sym_type == STT_OBJECT)
@@ -31,80 +34,88 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
         return 'w';
     }
     
-    //i STT_GNU_IFUNC  ///* Symbol is indirect code object */
-    if ( sym_type == STT_GNU_IFUNC) 
-    {
-        return 'I';
-    }
+    // //i STT_GNU_IFUNC  ///* Symbol is indirect code object */
+    // if ( sym_type == STT_GNU_IFUNC) 
+    // {
+    //     return 'I';
+    // }
     
-    if (sym_bind == STB_GNU_UNIQUE)
-        return 'u';
+    // // u The symbol is a unique global symbol.
+    // if (sym_bind == STB_GNU_UNIQUE)
+    //     return 'u';
     
-    if ( sym->st_shndx == SHN_ABS)
-        return 'A';
-    if ( sym->st_shndx == SHN_UNDEF)
-        return 'U';
+    // // A/a The symbol's value is absolute
+    // if ( sym->st_shndx == SHN_ABS)
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'A';
+    //     return 'a';
+    // }
 
-    shdr_tipo = org->shdr[sym->st_shndx].sh_info;
-    shdr_flag = org->shdr[sym->st_shndx].sh_flags;
+    // // U The symbol is undefined.
+    // if ( sym->st_shndx == SHN_UNDEF)
+    //     return 'U';
 
-    // printf("%016lx %-20s -> Type: %d -Bind: %d -Shdr Tipo: %d -Shdr Flag: %d\n", sym->st_value, (const char *)&org->strtab[sym->st_name],sym_type ,sym_bind,shdr_tipo, shdr_flag);
-    // 'B/b' 'S/s'
-    // .SUNW_bss .bss
-    if (shdr_tipo == SHT_NOBITS && (shdr_flag == ( SHF_WRITE | SHF_ALLOC)))
-    {
-        if (sym_type == STT_OBJECT)
-        {
-            if (sym_bind == STB_GLOBAL)
-                return 'S';
-            return 's';
-        }
-        if (sym_bind == STB_GLOBAL)
-            return 'B';
-        return 'b';
-    }
+    // shdr_tipo = org->shdr[sym->st_shndx].sh_type;
+    // shdr_flag = org->shdr[sym->st_shndx].sh_flags;
 
-    // 'C' SHN_COMMON - Symbols defined relative to this section are common symbols
-    if (shdr_tipo == SHN_COMMON)
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'C';
-        return 'c';
-    }
+    // // 'B/b' The symbol is in the BSS data section
+    // // 'S/s' The symbol is in an uninitialized or zero-initialized data section for small objects
+    // if (shdr_tipo == SHT_NOBITS && (shdr_flag == (SHF_WRITE | SHF_ALLOC)))
+    // {
+    //     if (sym_type == STT_OBJECT)
+    //     {
+    //         if (sym_bind == STB_GLOBAL)
+    //             return 'S';
+    //         return 's';
+    //     }
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'B';
+    //     return 'b';
+    // }
+
+    // // 'C' SHN_COMMON - Symbols defined relative to this section are common symbols
+    // if (shdr_tipo == SHN_COMMON)
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'C';
+    //     return 'c';
+    // }
 
     
 
-    // D    The symbol is in the initialized data section
-    //      .data && .data1
-    if (shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE))
-    {
-        if (sym_type == STT_OBJECT)
-        {
-            if (sym_bind == STB_GLOBAL)
-                return 'G';
-            return 'g';
-        }   
-        if (sym_bind == STB_GLOBAL)
-            return 'D';
-        return 'd';
-    }
+    // // D/d    The symbol is in the initialized data section .data && .data1
+    // // G/g    The symbol is in the initialized data section for small objects.  
+    // if ((shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE)) || \
+    //     (shdr_tipo == SHT_DYNAMIC && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
+    // {
+    //     if (sym_type == STT_OBJECT)
+    //     {
+    //         if (sym_bind == STB_GLOBAL)
+    //             return 'G';
+    //         return 'g';
+    //     }
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'D';
+    //     return 'd';
+    // }
 
-    //&& shdr_tipo == SHT_PROGBITS && shdr_flag == SHF_EXECINSTR sym_type == STT_FUNC sym_type == STT_FUNC && 
-    if ((shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'T';
-        return 't';
-    }
+    // // R   - The symbol is in a read only data section.
+    // if (shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC) )
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'R';
+    //     return 'r';
+    // }
 
-    // R   - The symbol is in a read only data section.
-    // .rodata && .rodata1
-    if (shdr_tipo == SHT_PROGBITS && shdr_flag == SHF_ALLOC )
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'R';
-        return 'r';
-    }
+    // // 
+    // if ((shdr_tipo == SHT_PROGBITS && shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'T';
+    //     return 't';
+    // }
+
     
     return '?';  // Otros casos (símbolo no reconocido o no inicializado)
 }
@@ -119,29 +130,26 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 	info = ELF64_ST_TYPE(sym->st_info);
     bind = ELF64_ST_BIND(sym->st_info);
 	type = get_type_sym64(sym, org);
-    // debug_sym64(sym,org);
-    // if (sym->st_name == 0 && info == 0 && sym->st_info == 0 && 
-    //     sym->st_shndx == 0 && sym->st_size == 0 && sym->st_value == 0)
-	// 	return;
-    
+    (void)sym_name;
+    (void)type;
 	if (info == STT_SECTION)
 		sym_name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
 	else
-        sym_name = (const char *)&org->strtab[sym->st_name];
+        sym_name = (const char *)&org->sym_strtab[sym->st_name];
 
 	if (info == STT_NOTYPE || info == STT_OBJECT || info == STT_FUNC || info == STT_COMMON || flags.a)
 	{
+		debug_sym64(sym, org);
 		if(flags.g && bind != STB_GLOBAL)
 			return;
 
-		if (type != 'U')
-		{
-			if(!flags.u)
-				printf("%016lx %c %-20s\n",sym->st_value,type, sym_name);
-		}
-		else
-			printf("                 %c %-20s\n",type, sym_name);
-		// debug_sym64(sym, org);
+		// if (type != 'U')
+		// {
+		// 	if(!flags.u)
+		// 		printf("%016lx %c %-20s\n",sym->st_value,type, sym_name);
+		// }
+		// else
+		// 	printf("                 %c %-20s\n",type, sym_name);
 	}
 	return;
 }
@@ -153,7 +161,7 @@ static void	 extract_Sym64(elf64_manager * org,void * _map)
 	int			c_aux;
 
 	strtab_aux = NULL;
-	org->strtab = NULL;
+	org->sym_strtab = NULL;
     org->sh_strtab = NULL;
 	//Miramos en cada entrada de la seccion header
 	for (int i = 0; i < org->elf_header->e_shnum; i++) {
@@ -164,6 +172,7 @@ static void	 extract_Sym64(elf64_manager * org,void * _map)
             
 			org->symbols = calloc (org->num_symbols + 1 , sizeof(Elf64_Sym));
 			c_aux = 0;
+            //Extraemos cada simbolo y quitamos la cabecera vacia (1er sym) de nuestros simbolos
 			for (int i = 0; i < org->num_symbols; i++) {
 				if ( symbols_temp[i].st_name == 0 && symbols_temp[i].st_info == 0 && symbols_temp[i].st_other == 0 && \
 					symbols_temp[i].st_shndx == 0 && symbols_temp[i].st_size == 0 && symbols_temp[i].st_value == 0)
@@ -178,37 +187,39 @@ static void	 extract_Sym64(elf64_manager * org,void * _map)
 
             strtab_aux = (const char *)(_map + org->shdr[i].sh_offset);
             if ( i != org->elf_header->e_shstrndx)
-                org->strtab = strtab_aux;
+                org->sym_strtab = strtab_aux;
             else
                 org->sh_strtab = strtab_aux;
 
         }
     }
     
-    if (DEBUG)
+    if (!DEBUG)
     {
         for (int i = 0; i < org->elf_header->e_shnum; i++) 
         {
-        //    debug_shdr64(&org->shdr[i], org);
+           debug_shdr64(&org->shdr[i], org);
         }
     }
 
 
-	if (org->strtab == NULL)
-		org->strtab = strtab_aux;
+	if (org->sym_strtab == NULL)
+		org->sym_strtab = strtab_aux;
 
 	return;
 }
 
+
 static	int	process_sym64(elf64_manager *org, active_flags flags)
 {
-	if (org->symbols && org->strtab) {
+	if (org->symbols && org->sym_strtab) {
 		if (!flags.p)
 		{
 			bubble_sort_sym64(org,flags);		//Organizamos los simbolos alfabeticamente
 		}
 		for (int i = 0; i < org->num_symbols; i++) {
 			show_Sym64(&org->symbols[i], org, flags); //Mostramos los simbolos
+            // break;
 		}
 	}
 	return (0);

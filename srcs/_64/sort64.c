@@ -7,12 +7,12 @@ static int compare_symbols(const Elf64_Sym *sym_a, const Elf64_Sym *sym_b, elf64
 	if (ELF64_ST_TYPE(sym_a->st_info) == STT_SECTION)
 		name_a = (const char *)&org->sh_strtab[org->shdr[sym_a->st_shndx].sh_name];
 	else
-		name_a = (const char *)&org->strtab[sym_a->st_name];
+		name_a = (const char *)&org->sym_strtab[sym_a->st_name];
 
 	if (ELF64_ST_TYPE(sym_b->st_info) == STT_SECTION)
 		name_b = (const char *)&org->sh_strtab[org->shdr[sym_b->st_shndx].sh_name];
 	else
-		name_b = (const char *)&org->strtab[sym_b->st_name];
+		name_b = (const char *)&org->sym_strtab[sym_b->st_name];
 
     
     if (flags.r)

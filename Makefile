@@ -8,9 +8,11 @@ RESET = "\033[1;0m"
 # RESOURCES #
 SRCS =	srcs/ft_nm.c \
 		srcs/main.c \
-		srcs/_64/analisis.c \
-		srcs/_64/debug.c \
-		srcs/_64/sort.c 
+		srcs/_64/analisis64.c \
+		srcs/_64/sort64.c	\
+		srcs/_32/analisis32.c \
+		srcs/_32/sort32.c	\
+		srcs/debug/debug.c 
 
 # FLAGS #
 OBJS_DIR = objetos

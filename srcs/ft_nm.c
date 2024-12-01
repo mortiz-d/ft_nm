@@ -24,7 +24,7 @@ static	int class_analisis(void *_map, int ei_class, active_flags flags)
 	}
 	else if (ei_class == ELFCLASS32)
 	{
-		printf("EL ELF ES VERSION 32\n");
+		analisis_ELF32(_map,flags);
 	}
 	else if (ei_class == ELFCLASS64)
 	{
@@ -35,7 +35,7 @@ static	int class_analisis(void *_map, int ei_class, active_flags flags)
 	return (0);
 }
 
-int	ft_nm(char *filename, int fd, active_flags flags)
+int	ft_nm(char *filename, int fd, active_flags flags, int mc)
 {
 	struct stat	_file_data; 		//Estructura util para almacenar los datos del archivo que se lee
 	void		*_map;            	//El mapeo de los datos para poder extraer que necesitamos en una direccion
@@ -50,9 +50,11 @@ int	ft_nm(char *filename, int fd, active_flags flags)
 	if (_map == MAP_FAILED)
 	    return NM_CANT_MMAP(filename);
 	_ei_class = header_checker(_map);
+	if (mc)
+		printf("\n%s:\n",filename);
 	class_analisis(_map, _ei_class, flags);
 	if (munmap(_map, _file_data.st_size) == -1)
 	    return NM_CANT_MUNMAP(filename);
-	return (0); // Retorno exitoso
+	return (1); // Retorno exitoso
 }
 
