@@ -12,7 +12,6 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
 
 - **`nm`**: Muestra las tablas de símbolos de un archivo binario.
 - **`readelf`**: Muestra información detallada sobre los encabezados de ELF, secciones y símbolos.
-## `readelf [opciones] archivo`
 <details>
   <summary>Opciones</summary>
   
@@ -26,7 +25,6 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
 </details>
 
 - **`objdump`**: Proporciona una forma de desensamblar el código y ver la estructura interna de los binarios.
-## `objdump [opciones] archivo`
 <details>
   <summary>Opciones</summary>
   
@@ -38,9 +36,9 @@ Entre las herramientas más útiles para examinar estos archivos y obtener detal
   - `-x` (detalles de las secciones)  
   - `-s` (volcado en hexadecimal)  
   - `-p` (dependencias)  
+</details>
 
 - **`hexdump`**: Permite visualizar el contenido binario de los archivos en diferentes formatos.
-## `hexdump [opciones] archivo`
 <details>
   <summary>Opciones</summary>
   
