@@ -40,8 +40,13 @@ int debug_sym64(Elf64_Sym *sym, elf64_manager *org) {
         else
             printf("name->%s\n", (const char *)&org->sym_strtab[sym->st_name]);
         
+        if (sym->st_shndx != SHN_ABS)
+            printf("section name->%s\n", (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name]);
+        else
+            printf("section name- NONE\n");
         printf("sh_name->%d\n", sym->st_name);
-        printf("Type determined[%c]\n", get_type_sym64(sym ,org));
+        printf("Type determined         [%c]\n", get_type_sym64(sym ,org));
+        printf("Type by special section [%c]\n", get_type_sym_special_sections_64(sym ,org));
         st_type = ELF64_ST_TYPE(sym->st_info);
         st_bind = ELF64_ST_BIND(sym->st_info);
         
@@ -106,6 +111,9 @@ int debug_sym64(Elf64_Sym *sym, elf64_manager *org) {
             case SHT_HIPROC: sh_type_str = "SHT_HIPROC"; break;
             case SHT_LOUSER: sh_type_str = "SHT_LOUSER"; break;
             case SHT_HIUSER: sh_type_str = "SHT_HIUSER"; break;
+            case SHT_INIT_ARRAY: sh_type_str = "SHT_INIT_ARRAY"; break;
+            case SHT_PREINIT_ARRAY: sh_type_str = "SHT_PREINIT_ARRAY"; break;
+            case SHT_FINI_ARRAY: sh_type_str = "SHT_FINI_ARRAY"; break;
             default: sh_type_str = "UNKNOWN"; break;
         }
         

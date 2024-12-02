@@ -10,114 +10,151 @@
     - ?             The symbol type is unknown
     */
 
+
+
+
 char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     int shdr_tipo;
     int shdr_flag;
     int sym_bind;
     int sym_type;
     
+    (void)shdr_flag;
+    (void)shdr_tipo;
+    (void)org;
     sym_bind = ELF64_ST_BIND(sym->st_info);
     sym_type = ELF64_ST_TYPE(sym->st_info);
+
+	// A/a The symbol's value is absolute
+    if ( sym->st_shndx == SHN_ABS)
+    {
+        if (sym_bind == STB_GLOBAL)
+            return 'A';
+        return 'a';
+    }
+
+	shdr_tipo = org->shdr[sym->st_shndx].sh_type;
+    shdr_flag = org->shdr[sym->st_shndx].sh_flags;
 
     // V/v The symbol is a weak object 
     // W/w The symbol is a weak symbol
     if (sym_bind == STB_WEAK)
     {
+    // printf("Encontramos cosas\n");
+        
         if (sym_type == STT_OBJECT)
         {
-            if (sym_bind == STB_GLOBAL)
-                return 'V';
-            return 'v';
+            if (shdr_tipo == SHT_NULL)
+                return 'v';
+            return 'V';
         }  
-        if (sym_bind == STB_GLOBAL)
-            return 'W';
-        return 'w';
+        if (shdr_tipo == SHT_NULL)
+            return 'w';
+        return 'W';
     }
     
     // //i STT_GNU_IFUNC  ///* Symbol is indirect code object */
-    // if ( sym_type == STT_GNU_IFUNC) 
-    // {
-    //     return 'I';
-    // }
+    if ( sym_type == STT_GNU_IFUNC) 
+        return 'I';
     
     // // u The symbol is a unique global symbol.
-    // if (sym_bind == STB_GNU_UNIQUE)
-    //     return 'u';
+    if (sym_bind == STB_GNU_UNIQUE)
+        return 'u';
     
-    // // A/a The symbol's value is absolute
-    // if ( sym->st_shndx == SHN_ABS)
-    // {
-    //     if (sym_bind == STB_GLOBAL)
-    //         return 'A';
-    //     return 'a';
-    // }
-
-    // // U The symbol is undefined.
-    // if ( sym->st_shndx == SHN_UNDEF)
-    //     return 'U';
-
-    // shdr_tipo = org->shdr[sym->st_shndx].sh_type;
-    // shdr_flag = org->shdr[sym->st_shndx].sh_flags;
+    // U The symbol is undefined.
+    if ( sym->st_shndx == SHN_UNDEF)
+        return 'U';
 
     // // 'B/b' The symbol is in the BSS data section
     // // 'S/s' The symbol is in an uninitialized or zero-initialized data section for small objects
-    // if (shdr_tipo == SHT_NOBITS && (shdr_flag == (SHF_WRITE | SHF_ALLOC)))
-    // {
-    //     if (sym_type == STT_OBJECT)
-    //     {
-    //         if (sym_bind == STB_GLOBAL)
-    //             return 'S';
-    //         return 's';
-    //     }
-    //     if (sym_bind == STB_GLOBAL)
-    //         return 'B';
-    //     return 'b';
-    // }
+    if (shdr_tipo == SHT_NOBITS && (shdr_flag == (SHF_WRITE | SHF_ALLOC)))
+    {
+        if (sym_type == STT_OBJECT)
+        {
+            if (sym_bind == STB_GLOBAL)
+                return 'S';
+            return 's';
+        }
+        if (sym_bind == STB_GLOBAL)
+            return 'B';
+        return 'b';
+    }
 
     // // 'C' SHN_COMMON - Symbols defined relative to this section are common symbols
-    // if (shdr_tipo == SHN_COMMON)
-    // {
-    //     if (sym_bind == STB_GLOBAL)
-    //         return 'C';
-    //     return 'c';
-    // }
+    if (shdr_tipo == SHN_COMMON)
+    {
+        if (sym_bind == STB_GLOBAL)
+            return 'C';
+        return 'c';
+    }
 
     
+    if ((shdr_tipo == SHT_DYNAMIC && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
+    {
+        if (sym_bind == STB_GLOBAL)
+            return 'D';
+        return 'd';
+    }
 
     // // D/d    The symbol is in the initialized data section .data && .data1
     // // G/g    The symbol is in the initialized data section for small objects.  
-    // if ((shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE)) || \
-    //     (shdr_tipo == SHT_DYNAMIC && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
-    // {
-    //     if (sym_type == STT_OBJECT)
-    //     {
-    //         if (sym_bind == STB_GLOBAL)
-    //             return 'G';
-    //         return 'g';
-    //     }
-    //     if (sym_bind == STB_GLOBAL)
-    //         return 'D';
-    //     return 'd';
-    // }
+    if ((shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
+    {
+        if (sym_type == STT_OBJECT)
+        {
+            if (sym_bind == STB_GLOBAL)
+                return 'G';
+            return 'g';
+        }
+        if (sym_bind == STB_GLOBAL)
+            return 'D';
+        return 'd';
+    }
 
     // // R   - The symbol is in a read only data section.
-    // if (shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC) )
-    // {
-    //     if (sym_bind == STB_GLOBAL)
-    //         return 'R';
-    //     return 'r';
-    // }
+    if ( (shdr_tipo == SHT_PROGBITS || shdr_tipo == SHT_NOTE ) && shdr_flag == (SHF_ALLOC) )
+    {
+        if (sym_bind == STB_GLOBAL)
+            return 'R';
+        return 'r';
+    }
 
     // // 
-    // if ((shdr_tipo == SHT_PROGBITS && shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
-    // {
-    //     if (sym_bind == STB_GLOBAL)
-    //         return 'T';
-    //     return 't';
-    // }
+    if ((shdr_tipo == SHT_PROGBITS && shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
+    {
+        if (sym_bind == STB_GLOBAL)
+            return 'T';
+        return 't';
+    }
 
     
     return '?';  // Otros casos (símbolo no reconocido o no inicializado)
+}
+
+char get_type_sym_special_sections_64(Elf64_Sym *sym, elf64_manager * org) {
+    char const * name ;
+    char type;
+    char *sections [9] = {".bss",".dynamic",".got",".data",".data1",".init_array",".preinit_array",".fini_array", ".text"};
+    char char_type[9] = {'b','d','d','d','d','d','d','d', 't'};
+    type = '?';
+    if ( sym->st_shndx == SHN_ABS)
+        return (type);
+    name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
+    for (int i = 0; i < 9; i++)
+    {
+    // printf("Vuelta %d\n", 0);
+        // printf("Vuelta %d - %s vs %s\n", i, name , sections[i]);
+        if(strcmp(sections[i],name) == 0)
+        {
+            type = (char_type[i]);
+            break;
+        }
+    }
+    if (ELF64_ST_BIND(sym->st_info) == STB_GLOBAL)
+        type = ft_toupper(type);
+
+    return (type);
+
 }
 
 void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
@@ -129,7 +166,9 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 
 	info = ELF64_ST_TYPE(sym->st_info);
     bind = ELF64_ST_BIND(sym->st_info);
-	type = get_type_sym64(sym, org);
+    type = get_type_sym_special_sections_64(sym,org);
+    if (type == '?')
+	    type = get_type_sym64(sym, org);
     (void)sym_name;
     (void)type;
 	if (info == STT_SECTION)
@@ -137,21 +176,24 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 	else
         sym_name = (const char *)&org->sym_strtab[sym->st_name];
 
+	// if  (type == 'B' || type == 'b' || type == 'S' || type == 's')
+		// debug_sym64(sym, org);
+
 	if (info == STT_NOTYPE || info == STT_OBJECT || info == STT_FUNC || info == STT_COMMON || flags.a)
 	{
-		debug_sym64(sym, org);
+		// debug_sym64(sym, org);
 		if(flags.g && bind != STB_GLOBAL)
 			return;
 
-		// if (type != 'U')
-		// {
-		// 	if(!flags.u)
-		// 		printf("%016lx %c %-20s\n",sym->st_value,type, sym_name);
-		// }
-		// else
-		// 	printf("                 %c %-20s\n",type, sym_name);
+		if (type == 'U' || type == 'w')
+			printf("                 %c %-20s\n",type, sym_name);
+		else
+			if(!flags.u)
+				printf("%016lx %c %-20s\n",sym->st_value,type, sym_name);
 	}
 	return;
+    
+
 }
 
 static void	 extract_Sym64(elf64_manager * org,void * _map)
@@ -219,7 +261,8 @@ static	int	process_sym64(elf64_manager *org, active_flags flags)
 		}
 		for (int i = 0; i < org->num_symbols; i++) {
 			show_Sym64(&org->symbols[i], org, flags); //Mostramos los simbolos
-            // break;
+            // if (i == 3)
+            //     break;
 		}
 	}
 	return (0);

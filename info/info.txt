@@ -117,6 +117,7 @@ symbol posibilities
 - ?             The symbol type is unknown
 
 
+
 FLAGS nm
 • -a Display all symbols, even debugger-only symbols; normally these are not listed. 
 • -g Display only external symbols.
@@ -135,3 +136,127 @@ R/r	.rodata, .rodata1	Datos solo lectura, globales o locales.
 U	-	Símbolo indefinido, no tiene una definición en el archivo.
 g	.got	Símbolos globales pequeños en la tabla de desplazamiento global.
 -	-	Símbolos de depuración (stabs en archivos a.out).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+    char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
+    int shdr_tipo;
+    int shdr_flag;
+    int sym_bind;
+    int sym_type;
+    
+    sym_bind = ELF64_ST_BIND(sym->st_info);
+    sym_type = ELF64_ST_TYPE(sym->st_info);
+
+    // V/v The symbol is a weak object 
+    // W/w The symbol is a weak symbol
+    if (sym_bind == STB_WEAK)
+    {
+        if (sym_type == STT_OBJECT)
+        {
+            if (sym_bind == STB_GLOBAL)
+                return 'V';
+            return 'v';
+        }  
+        if (sym_bind == STB_GLOBAL)
+            return 'W';
+        return 'w';
+    }
+    
+    // //i STT_GNU_IFUNC  //Symbol is indirect code object 
+    // if ( sym_type == STT_GNU_IFUNC) 
+    // {
+    //     return 'I';
+    // }
+    
+    // // u The symbol is a unique global symbol.
+    // if (sym_bind == STB_GNU_UNIQUE)
+    //     return 'u';
+    
+    // // A/a The symbol's value is absolute
+    // if ( sym->st_shndx == SHN_ABS)
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'A';
+    //     return 'a';
+    // }
+
+    // // U The symbol is undefined.
+    // if ( sym->st_shndx == SHN_UNDEF)
+    //     return 'U';
+
+    // shdr_tipo = org->shdr[sym->st_shndx].sh_type;
+    // shdr_flag = org->shdr[sym->st_shndx].sh_flags;
+
+    // // 'B/b' The symbol is in the BSS data section
+    // // 'S/s' The symbol is in an uninitialized or zero-initialized data section for small objects
+    // if (shdr_tipo == SHT_NOBITS && (shdr_flag == (SHF_WRITE | SHF_ALLOC)))
+    // {
+    //     if (sym_type == STT_OBJECT)
+    //     {
+    //         if (sym_bind == STB_GLOBAL)
+    //             return 'S';
+    //         return 's';
+    //     }
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'B';
+    //     return 'b';
+    // }
+
+    // // 'C' SHN_COMMON - Symbols defined relative to this section are common symbols
+    // if (shdr_tipo == SHN_COMMON)
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'C';
+    //     return 'c';
+    // }
+
+    
+
+    // // D/d    The symbol is in the initialized data section .data && .data1
+    // // G/g    The symbol is in the initialized data section for small objects.  
+    // if ((shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE)) || \
+    //     (shdr_tipo == SHT_DYNAMIC && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
+    // {
+    //     if (sym_type == STT_OBJECT)
+    //     {
+    //         if (sym_bind == STB_GLOBAL)
+    //             return 'G';
+    //         return 'g';
+    //     }
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'D';
+    //     return 'd';
+    // }
+
+    // // R   - The symbol is in a read only data section.
+    // if (shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC) )
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'R';
+    //     return 'r';
+    // }
+
+    // // 
+    // if ((shdr_tipo == SHT_PROGBITS && shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
+    // {
+    //     if (sym_bind == STB_GLOBAL)
+    //         return 'T';
+    //     return 't';
+    // }
+
+    
+    // return '?';  // Otros casos (símbolo no reconocido o no inicializado)
+// }

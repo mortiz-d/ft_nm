@@ -21,7 +21,7 @@ OBJS = $(SRCS:srcs/%.c=$(OBJS_DIR)/%.o)
 NAME = ft_nm
 
 LIBFT_A = libft/libft.a
-FILE_TEST = tests/ft_strlen.o#objetos/main.o#
+FILE_TEST = ft_nm#tests/ft_strlen.o#objetos/main.o#
 
 CC = gcc
 
@@ -53,7 +53,8 @@ fclean: clean
 re: fclean all
 
 test: re
-	./$(NAME) $(FILE_TEST)
+	clear
+	./$(NAME) -a $(FILE_TEST)
 
 .PHONY: all clean fclean re test
 

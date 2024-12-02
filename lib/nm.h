@@ -69,6 +69,7 @@ int	ft_nm			(char *filename, int fd, active_flags flags, int mc);
 int	analisis_ELF64	(void * _map, active_flags flags);
 int	analisis_ELF32	(void * _map, active_flags flags);
 char get_type_sym64(Elf64_Sym *sym, elf64_manager * org);
+char get_type_sym_special_sections_64(Elf64_Sym *sym, elf64_manager * org);
 
 //SORTING
 void	bubble_sort_sym64(elf64_manager * org, active_flags flags);
