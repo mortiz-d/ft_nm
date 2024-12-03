@@ -1,16 +1,29 @@
 #include "../../lib/nm.h"
 #include <elf.h>
 
-/*
-    symbol posibilities
-    """" -i              For PE format files this indicates that the symbol is in a section specific to the implementation of DLLs.
-    -N              The symbol is a debugging symbol.
-    -p              The symbol is in a stack unwind section.
-    -'-'            The symbol is a stabs symbol in an a.out object file. 
-    - ?             The symbol type is unknown
-    */
+char get_type_sym_special_sections_64(Elf64_Sym *sym, elf64_manager * org) {
+    char const * name ;
+    char type;
+    char *sections [13] = {".bss",".sbss",".dynamic",".got",".data",".data1",".init_array",".preinit_array",".fini_array",".sdata",".text" ,".rodata",".rodata1"};
+    char char_type[13] = {'b','s','d','d','d','d','d','d','d','g','t','r','r'};
+    type = '?';
+    if ( sym->st_shndx == SHN_ABS)
+        return (type);
+    name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
+    for (int i = 0; i < 13; i++)
+    {
+        if(strcmp(sections[i],name) == 0)
+        {
+            type = (char_type[i]);
+            break;
+        }
+    }
+    if (ELF64_ST_BIND(sym->st_info) == STB_GLOBAL)
+        type = ft_toupper(type);
 
+    return (type);
 
+}
 
 
 char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
@@ -18,6 +31,7 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     int shdr_flag;
     int sym_bind;
     int sym_type;
+    char r;
     
     (void)shdr_flag;
     (void)shdr_tipo;
@@ -52,6 +66,11 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
             return 'w';
         return 'W';
     }
+
+    //If symbol has special tag , we can identify for it and categorize it
+    r = get_type_sym_special_sections_64(sym,org);
+    if (r != '?')
+        return (r);
     
     // //i STT_GNU_IFUNC  ///* Symbol is indirect code object */
     if ( sym_type == STT_GNU_IFUNC) 
@@ -69,12 +88,6 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     // // 'S/s' The symbol is in an uninitialized or zero-initialized data section for small objects
     if (shdr_tipo == SHT_NOBITS && (shdr_flag == (SHF_WRITE | SHF_ALLOC)))
     {
-        if (sym_type == STT_OBJECT)
-        {
-            if (sym_bind == STB_GLOBAL)
-                return 'S';
-            return 's';
-        }
         if (sym_bind == STB_GLOBAL)
             return 'B';
         return 'b';
@@ -88,7 +101,7 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
         return 'c';
     }
 
-    
+    //D/d The symbol is in the initialized data section.
     if ((shdr_tipo == SHT_DYNAMIC && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
     {
         if (sym_bind == STB_GLOBAL)
@@ -96,16 +109,9 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
         return 'd';
     }
 
-    // // D/d    The symbol is in the initialized data section .data && .data1
-    // // G/g    The symbol is in the initialized data section for small objects.  
+    // // D/d    The symbol is in the initialized data section .data && .data1  
     if ((shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
     {
-        if (sym_type == STT_OBJECT)
-        {
-            if (sym_bind == STB_GLOBAL)
-                return 'G';
-            return 'g';
-        }
         if (sym_bind == STB_GLOBAL)
             return 'D';
         return 'd';
@@ -119,43 +125,17 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
         return 'r';
     }
 
-    // // 
+    // // -T/t The symbol is in the text (code) section.
     if ((shdr_tipo == SHT_PROGBITS && shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
     {
         if (sym_bind == STB_GLOBAL)
             return 'T';
         return 't';
     }
-
     
     return '?';  // Otros casos (símbolo no reconocido o no inicializado)
 }
 
-char get_type_sym_special_sections_64(Elf64_Sym *sym, elf64_manager * org) {
-    char const * name ;
-    char type;
-    char *sections [9] = {".bss",".dynamic",".got",".data",".data1",".init_array",".preinit_array",".fini_array", ".text"};
-    char char_type[9] = {'b','d','d','d','d','d','d','d', 't'};
-    type = '?';
-    if ( sym->st_shndx == SHN_ABS)
-        return (type);
-    name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
-    for (int i = 0; i < 9; i++)
-    {
-    // printf("Vuelta %d\n", 0);
-        // printf("Vuelta %d - %s vs %s\n", i, name , sections[i]);
-        if(strcmp(sections[i],name) == 0)
-        {
-            type = (char_type[i]);
-            break;
-        }
-    }
-    if (ELF64_ST_BIND(sym->st_info) == STB_GLOBAL)
-        type = ft_toupper(type);
-
-    return (type);
-
-}
 
 void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 {
@@ -166,18 +146,15 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 
 	info = ELF64_ST_TYPE(sym->st_info);
     bind = ELF64_ST_BIND(sym->st_info);
-    type = get_type_sym_special_sections_64(sym,org);
-    if (type == '?')
-	    type = get_type_sym64(sym, org);
+    // type = get_type_sym_special_sections_64(sym,org);
+    // if (type == '?')
+	type = get_type_sym64(sym, org);
     (void)sym_name;
     (void)type;
 	if (info == STT_SECTION)
 		sym_name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
 	else
         sym_name = (const char *)&org->sym_strtab[sym->st_name];
-
-	// if  (type == 'B' || type == 'b' || type == 'S' || type == 's')
-		// debug_sym64(sym, org);
 
 	if (info == STT_NOTYPE || info == STT_OBJECT || info == STT_FUNC || info == STT_COMMON || flags.a)
 	{
