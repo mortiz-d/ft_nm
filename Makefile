@@ -25,7 +25,7 @@ FILE_TEST = ft_nm#tests/ft_strlen.o#objetos/main.o#
 
 CC = gcc
 
-CFLAGS = -std=c99 -Wall -Werror -Wextra
+CFLAGS = -std=c99  -Wall -Werror -Wextra
 
 # Instructions #
 all: $(NAME)
@@ -38,7 +38,7 @@ $(NAME): $(OBJS)
 $(OBJS_DIR)/%.o: srcs/%.c
 #Creamos las carpetas necesarias para compilar
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $<  -o $@
+	$(CC) $(CFLAGS) -g -c $<  -o $@
 	$(CYAN) NM Object Compiled $< $(RESET)
 
 clean:

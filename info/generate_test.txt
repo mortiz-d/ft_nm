@@ -1,0 +1,3 @@
+//
+gcc -fPIC -c mifunciones.c -o mifunciones.o
+gcc -shared -o libmifunciones.so mifunciones.o

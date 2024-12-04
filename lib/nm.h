@@ -30,6 +30,7 @@
 # define DEBUG 1
 #endif
 
+#define NM_FILE_CORE_DUMP (printf("nm: fichero es coredump\n"), 0)
 #define NM_FILE_NOT_FOUND(filename) (printf("nm: '%s': No hay tal fichero\n", filename), 0)
 #define NM_IS_DIR(filename) (printf("nm: Aviso: '%s' es un directorio\n", filename), 0)
 #define NM_CANT_MMAP(filename) (printf("nm: Aviso: '%s' no se puede mapear\n", filename), 0)

@@ -53,9 +53,7 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     // V/v The symbol is a weak object 
     // W/w The symbol is a weak symbol
     if (sym_bind == STB_WEAK)
-    {
-    // printf("Encontramos cosas\n");
-        
+    {  
         if (sym_type == STT_OBJECT)
         {
             if (shdr_tipo == SHT_NULL)
@@ -85,55 +83,33 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
         return 'U';
 
     // // 'B/b' The symbol is in the BSS data section
-    // // 'S/s' The symbol is in an uninitialized or zero-initialized data section for small objects
     if (shdr_tipo == SHT_NOBITS && (shdr_flag == (SHF_WRITE | SHF_ALLOC)))
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'B';
-        return 'b';
-    }
+        r = 'b';
 
     // // 'C' SHN_COMMON - Symbols defined relative to this section are common symbols
     if (shdr_tipo == SHN_COMMON)
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'C';
-        return 'c';
-    }
+        r = 'c';
 
     //D/d The symbol is in the initialized data section.
     if ((shdr_tipo == SHT_DYNAMIC && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'D';
-        return 'd';
-    }
+        r = 'd';
 
     // // D/d    The symbol is in the initialized data section .data && .data1  
     if ((shdr_tipo == SHT_PROGBITS && shdr_flag == (SHF_ALLOC | SHF_WRITE)))
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'D';
-        return 'd';
-    }
+        r = 'd';
 
     // // R   - The symbol is in a read only data section.
-    if ( (shdr_tipo == SHT_PROGBITS || shdr_tipo == SHT_NOTE ) && shdr_flag == (SHF_ALLOC) )
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'R';
-        return 'r';
-    }
+    if ( ((shdr_tipo == SHT_PROGBITS) && (shdr_flag & ~SHF_ALLOC) == 0) || shdr_tipo == SHT_NOTE )
+        r = 'r';
 
     // // -T/t The symbol is in the text (code) section.
-    if ((shdr_tipo == SHT_PROGBITS && shdr_flag & ( SHF_EXECINSTR | SHF_ALLOC)) != 0 )
-    {
-        if (sym_bind == STB_GLOBAL)
-            return 'T';
-        return 't';
-    }
+    if ((shdr_tipo == SHT_PROGBITS && (shdr_flag & (SHF_EXECINSTR | SHF_ALLOC)) == (SHF_EXECINSTR | SHF_ALLOC) ))
+        r = 't';
     
-    return '?';  // Otros casos (símbolo no reconocido o no inicializado)
+    if (sym_bind == STB_GLOBAL && r != '?')
+        return (ft_toupper(r));
+
+    return (r);
 }
 
 
@@ -146,11 +122,10 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 
 	info = ELF64_ST_TYPE(sym->st_info);
     bind = ELF64_ST_BIND(sym->st_info);
-    // type = get_type_sym_special_sections_64(sym,org);
-    // if (type == '?')
 	type = get_type_sym64(sym, org);
-    (void)sym_name;
     (void)type;
+    (void)sym_name;
+    (void)bind;
 	if (info == STT_SECTION)
 		sym_name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
 	else
@@ -163,10 +138,10 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 			return;
 
 		if (type == 'U' || type == 'w')
-			printf("                 %c %-20s\n",type, sym_name);
+			printf("                 %c %s\n",type, sym_name);
 		else
 			if(!flags.u)
-				printf("%016lx %c %-20s\n",sym->st_value,type, sym_name);
+				printf("%016lx %c %s\n",sym->st_value,type, sym_name);
 	}
 	return;
     
@@ -182,13 +157,12 @@ static void	 extract_Sym64(elf64_manager * org,void * _map)
 	strtab_aux = NULL;
 	org->sym_strtab = NULL;
     org->sh_strtab = NULL;
-	//Miramos en cada entrada de la seccion header
+	//Miramos en cada seccion 
 	for (int i = 0; i < org->elf_header->e_shnum; i++) {
-		//Comprobamos en los tipos de shoulder la tabla de simbolos
+		//Buscamos el shoulder que tenga la tabla de simbolos
 		if (org->shdr[i].sh_type == SHT_SYMTAB) {  // debug_shdr64(&org->shdr[i]);
 			symbols_temp = (Elf64_Sym *)(_map + org->shdr[i].sh_offset);
 			org->num_symbols = org->shdr[i].sh_size / sizeof(Elf64_Sym);
-            
 			org->symbols = calloc (org->num_symbols + 1 , sizeof(Elf64_Sym));
 			c_aux = 0;
             //Extraemos cada simbolo y quitamos la cabecera vacia (1er sym) de nuestros simbolos
@@ -202,8 +176,10 @@ static void	 extract_Sym64(elf64_manager * org,void * _map)
 				org->symbols[i] = symbols_temp[c_aux++];                
 			}
         }
+        /*Buscamos la seccion con la listas de nombres (puede haber varias 
+        , primero buscamos la especifica de los simbolos sino asumimos que la destinada a la 
+        seccion tiene tambien los simbolos) */
         if (org->shdr[i].sh_type == SHT_STRTAB ) {
-
             strtab_aux = (const char *)(_map + org->shdr[i].sh_offset);
             if ( i != org->elf_header->e_shstrndx)
                 org->sym_strtab = strtab_aux;
@@ -212,15 +188,6 @@ static void	 extract_Sym64(elf64_manager * org,void * _map)
 
         }
     }
-    
-    if (!DEBUG)
-    {
-        for (int i = 0; i < org->elf_header->e_shnum; i++) 
-        {
-           debug_shdr64(&org->shdr[i], org);
-        }
-    }
-
 
 	if (org->sym_strtab == NULL)
 		org->sym_strtab = strtab_aux;
@@ -250,7 +217,9 @@ int	analisis_ELF64(void * _map, active_flags flags)
 	elf64_manager org;
 
 	org.elf_header =  (Elf64_Ehdr *)_map;                               //Sacamos el header del archivo elf
-	org.shdr = (Elf64_Shdr *)((char *)_map + org.elf_header->e_shoff);  //Sacamos la lista de los shoulders
+	if (org.elf_header->e_entry == ET_CORE)
+        return (NM_FILE_CORE_DUMP);
+    org.shdr = (Elf64_Shdr *)((char *)_map + org.elf_header->e_shoff);  //Sacamos la lista de los shoulders
 	extract_Sym64(&org,_map);     //Extraigo los simbolos
 	process_sym64(&org, flags);          //Se procesan para mostrarse
 	free(org.symbols);              //Los liberamos de la memoria

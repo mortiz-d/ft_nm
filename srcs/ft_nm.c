@@ -19,17 +19,11 @@ static int	header_checker(void *_map)
 static	int class_analisis(void *_map, int ei_class, active_flags flags)
 {
 	if (ei_class == ELFCLASSNONE)
-	{
 		printf("EL ELF NO TIENE VERSION\n");
-	}
 	else if (ei_class == ELFCLASS32)
-	{
 		analisis_ELF32(_map,flags);
-	}
 	else if (ei_class == ELFCLASS64)
-	{
 		analisis_ELF64(_map,flags);
-	}
 	else
 		return (1);
 	return (0);
