@@ -25,7 +25,7 @@ FILE_TEST = ft_nm#tests/ft_strlen.o#objetos/main.o#
 
 CC = gcc
 
-CFLAGS = -std=c99  -Wall -Werror -Wextra
+CFLAGS = -std=c99   -Wall -Werror -Wextra
 
 # Instructions #
 all: $(NAME)

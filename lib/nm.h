@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   nm.h                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: miguelangelortizdelburgo <miguelangelor    +#+  +:+       +#+        */
+/*   By: mortiz-d <mortiz-d@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/17 12:51:39 by mortiz-d          #+#    #+#             */
-/*   Updated: 2024/11/15 00:14:03 by miguelangel      ###   ########.fr       */
+/*   Updated: 2024/12/12 16:57:28 by mortiz-d         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,10 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include "../libft/libft.h"
-
+#include <elf.h>
 
 #ifndef DEBUG
-# define DEBUG 1
+# define DEBUG 0
 #endif
 
 #define NM_FILE_CORE_DUMP (printf("nm: fichero es coredump\n"), 0)

@@ -1,5 +1,5 @@
 #include "../../lib/nm.h"
-#include <elf.h>
+
 
 char get_type_sym_special_sections_64(Elf64_Sym *sym, elf64_manager * org) {
     char const * name ;
@@ -25,7 +25,6 @@ char get_type_sym_special_sections_64(Elf64_Sym *sym, elf64_manager * org) {
 
 }
 
-
 char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     int shdr_tipo;
     int shdr_flag;
@@ -33,9 +32,6 @@ char get_type_sym64(Elf64_Sym *sym, elf64_manager * org) {
     int sym_type;
     char r;
     
-    (void)shdr_flag;
-    (void)shdr_tipo;
-    (void)org;
     sym_bind = ELF64_ST_BIND(sym->st_info);
     sym_type = ELF64_ST_TYPE(sym->st_info);
 
@@ -123,17 +119,17 @@ void	show_Sym64(Elf64_Sym *sym, elf64_manager *org, active_flags flags)
 	info = ELF64_ST_TYPE(sym->st_info);
     bind = ELF64_ST_BIND(sym->st_info);
 	type = get_type_sym64(sym, org);
-    (void)type;
-    (void)sym_name;
-    (void)bind;
 	if (info == STT_SECTION)
 		sym_name = (const char *)&org->sh_strtab[org->shdr[sym->st_shndx].sh_name];
 	else
         sym_name = (const char *)&org->sym_strtab[sym->st_name];
-
+    if (DEBUG)
+    {
+        debug_sym64(sym, org);
+        return ;
+    }
 	if (info == STT_NOTYPE || info == STT_OBJECT || info == STT_FUNC || info == STT_COMMON || flags.a)
 	{
-		// debug_sym64(sym, org);
 		if(flags.g && bind != STB_GLOBAL)
 			return;
 
@@ -205,8 +201,6 @@ static	int	process_sym64(elf64_manager *org, active_flags flags)
 		}
 		for (int i = 0; i < org->num_symbols; i++) {
 			show_Sym64(&org->symbols[i], org, flags); //Mostramos los simbolos
-            // if (i == 3)
-            //     break;
 		}
 	}
 	return (0);
@@ -220,8 +214,8 @@ int	analisis_ELF64(void * _map, active_flags flags)
 	if (org.elf_header->e_entry == ET_CORE)
         return (NM_FILE_CORE_DUMP);
     org.shdr = (Elf64_Shdr *)((char *)_map + org.elf_header->e_shoff);  //Sacamos la lista de los shoulders
-	extract_Sym64(&org,_map);     //Extraigo los simbolos
-	process_sym64(&org, flags);          //Se procesan para mostrarse
+	extract_Sym64(&org,_map);       //Extraigo los simbolos
+	process_sym64(&org, flags);     //Se procesan para mostrarse
 	free(org.symbols);              //Los liberamos de la memoria
     return (0);
 }
